@@ -1,9 +1,8 @@
 export const API_CONFIG = {
-  // Environment detection - use local backend for development
+  // Environment detection - use Render backend
   getBaseUrl: () => {
-    // Use local backend for now
-    // TODO: Update this to production URL when deploying
-    return "http://localhost:3000";
+    // Use Render backend in production
+    return "https://propulse-5kb7.onrender.com";
   },
 
   // API endpoints
