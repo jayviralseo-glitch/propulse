@@ -9,7 +9,8 @@
     "http://localhost:3000/*",
     "http://localhost:5173/*",
     "https://propulse-pied.vercel.app/*",
-    "https://propulse-backend-2024-11624eb5aa5e.herokuapp.com/*"
+    "https://propulse-mu.vercel.app/*",
+    "https://propulse-5kb7.onrender.com/*"
   ],
   "action": {
     "default_popup": "src/popup/index.html",
