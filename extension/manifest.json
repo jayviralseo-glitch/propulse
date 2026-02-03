@@ -6,8 +6,6 @@
   "permissions": ["storage", "clipboardWrite", "scripting", "tabs"],
   "host_permissions": [
     "https://*.upwork.com/*",
-    "http://localhost:3000/*",
-    "http://localhost:5173/*",
     "https://propulse-pied.vercel.app/*",
     "https://propulse-mu.vercel.app/*",
     "https://propulse-5kb7.onrender.com/*"
