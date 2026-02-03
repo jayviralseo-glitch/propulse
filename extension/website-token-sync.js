@@ -1,0 +1,78 @@
+// Website Token Sync Script for ProPulse Extension
+// Add this script to your website to enable token syncing with the extension
+
+(function () {
+  "use strict";
+
+  // Check if extension is available
+  function isExtensionAvailable() {
+    return typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id;
+  }
+
+  // Sync token with extension
+  function syncTokenWithExtension() {
+    if (!isExtensionAvailable()) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+
+      if (token && user) {
+        chrome.runtime.sendMessage(
+          {
+            type: "STORE_TOKEN",
+            token: token,
+            user: user,
+          },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.log("Extension not available");
+            } else {
+              console.log("Token synced with ProPulse extension");
+            }
+          }
+        );
+      }
+    } catch (error) {
+      console.log("Error syncing with extension:", error);
+    }
+  }
+
+  // Monitor localStorage changes
+  function monitorTokenChanges() {
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function (key, value) {
+      originalSetItem.call(localStorage, key, value);
+
+      // If token or user data changed, sync with extension
+      if (key === "token" || key === "user") {
+        setTimeout(syncTokenWithExtension, 100); // Small delay to ensure value is set
+      }
+    };
+  }
+
+  // Initial sync
+  function init() {
+    // Monitor for changes
+    monitorTokenChanges();
+
+    // Initial sync if token exists
+    setTimeout(syncTokenWithExtension, 1000);
+
+    // Also sync when page becomes visible (user returns to tab)
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        setTimeout(syncTokenWithExtension, 500);
+      }
+    });
+  }
+
+  // Start monitoring when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();

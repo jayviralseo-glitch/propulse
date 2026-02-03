@@ -1,0 +1,11 @@
+backend/.env
+frontend/.env
+backend/node_modules
+frontend/node_modules
+extension/node_modules
+extension/dist
+frontend/dist
+
+# macOS system files
+.DS_Store
+**/.DS_Store

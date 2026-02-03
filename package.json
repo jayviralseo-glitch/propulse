@@ -1,0 +1,17 @@
+{
+  "name": "propulse",
+  "version": "1.0.0",
+  "description": "ProPulse - Job proposal generator",
+  "main": "backend/app.js",
+  "scripts": {
+    "start": "cd backend && node app.js",
+    "dev": "cd backend && nodemon app.js",
+    "postinstall": "cd backend && npm install"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "cacheDirectories": [
+    "backend/node_modules"
+  ]
+}
