@@ -46,6 +46,7 @@ const allowedOrigins = [
   "https://propulse-pied.vercel.app",
   "https://propulse-mu.vercel.app",
   "https://propulse-5kb7.onrender.com",
+  "https://www.upwork.com",
 ];
 
 app.use(

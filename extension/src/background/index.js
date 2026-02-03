@@ -61,7 +61,7 @@ class TokenSync {
               url: [
                 "http://localhost:5173/*",
                 "https://propulse-pied.vercel.app/*",
-                "https://propulse-mu.vercel.app/*"
+                "https://propulse-mu.vercel.app/*",
               ],
             });
             if (tabs.length > 0) {
@@ -77,9 +77,11 @@ class TokenSync {
 
   isOurWebsite(url) {
     if (!url) return false;
-    return url.includes("localhost:5173") || 
-           url.includes("propulse-pied.vercel.app") ||
-           url.includes("propulse-mu.vercel.app");
+    return (
+      url.includes("localhost:5173") ||
+      url.includes("propulse-pied.vercel.app") ||
+      url.includes("propulse-mu.vercel.app")
+    );
   }
 
   async getStoredToken(sendResponse) {
@@ -130,7 +132,7 @@ class TokenSync {
         // Instead of relying on localStorage user data, fetch fresh user data from the API
         await this.fetchAndStoreUserData(result.token);
         console.log(
-          "Token synced and fresh user data fetched from localhost:5173"
+          "Token synced and fresh user data fetched from localhost:5173",
         );
       }
     } catch (error) {
@@ -143,13 +145,13 @@ class TokenSync {
       console.log("🔍 Attempting to fetch user data from API...");
       console.log(
         "🔍 Using token:",
-        token ? `${token.substring(0, 20)}...` : null
+        token ? `${token.substring(0, 20)}...` : null,
       );
       console.log("🔍 API_CONFIG available:", !!API_CONFIG);
       console.log("🔍 API_CONFIG.BASE_URL:", API_CONFIG?.BASE_URL);
       console.log(
         "🔍 API_CONFIG.ENDPOINTS.AUTH.ME:",
-        API_CONFIG?.ENDPOINTS?.AUTH?.ME
+        API_CONFIG?.ENDPOINTS?.AUTH?.ME,
       );
 
       // Fetch fresh user data from the BACKEND API
@@ -167,14 +169,14 @@ class TokenSync {
       console.log("🔍 API Response status:", response.status);
       console.log(
         "🔍 API Response headers:",
-        Object.fromEntries(response.headers.entries())
+        Object.fromEntries(response.headers.entries()),
       );
 
       if (response.ok) {
         const responseText = await response.text();
         console.log(
           "🔍 API Response text (first 200 chars):",
-          responseText.substring(0, 200)
+          responseText.substring(0, 200),
         );
 
         try {
@@ -186,7 +188,7 @@ class TokenSync {
             await this.storeToken(token, userData.user);
             console.log(
               "✅ Fresh user data fetched and stored:",
-              userData.user.email
+              userData.user.email,
             );
           } else {
             console.error("❌ Failed to get user data from API:", userData);
