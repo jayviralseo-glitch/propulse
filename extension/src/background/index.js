@@ -2,7 +2,7 @@ import API_CONFIG from "../config/api.js";
 
 // Background service worker for ProPulse extension
 
-// JWT Token Sync between website and extension - Only localhost:5173
+// JWT Token Sync between website and extension
 class TokenSync {
   constructor() {
     this.init();
@@ -58,7 +58,11 @@ class TokenSync {
             console.log("Token data might be stale, checking for updates...");
             // Try to sync from any open tabs
             const tabs = await chrome.tabs.query({
-              url: ["http://localhost:5173/*", "https://propulse-pied.vercel.app/*"],
+              url: [
+                "http://localhost:5173/*",
+                "https://propulse-pied.vercel.app/*",
+                "https://propulse-mu.vercel.app/*"
+              ],
             });
             if (tabs.length > 0) {
               await this.syncTokenFromTab(tabs[0].id);
@@ -73,7 +77,9 @@ class TokenSync {
 
   isOurWebsite(url) {
     if (!url) return false;
-    return url.includes("localhost:5173") || url.includes("propulse-pied.vercel.app");
+    return url.includes("localhost:5173") || 
+           url.includes("propulse-pied.vercel.app") ||
+           url.includes("propulse-mu.vercel.app");
   }
 
   async getStoredToken(sendResponse) {
