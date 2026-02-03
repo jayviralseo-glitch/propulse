@@ -40,8 +40,25 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // ----- CORS -----
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://propulse-pied.vercel.app",
+  "https://propulse-mu.vercel.app",
+];
 
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
 app.use(
   "/api/payments/notify",
@@ -51,7 +68,7 @@ app.use(
       // Save the exact wire string for signature calculation
       req.rawBody = buf.toString("utf8");
     },
-  })
+  }),
 );
 
 // ----- Generic parsers (safe for all other routes) -----
@@ -59,7 +76,7 @@ app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true, // ok for normal forms elsewhere
-  })
+  }),
 );
 
 // ----- Routes -----

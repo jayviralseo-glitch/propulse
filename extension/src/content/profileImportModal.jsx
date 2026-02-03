@@ -56,10 +56,17 @@ function ProfileImportModal({ onClose }) {
     setStatus("Extracting profile data...");
 
     try {
+      // Extract Upwork profile ID from URL
+      const upworkProfileId = extractUpworkProfileId();
+      console.log("🔍 Upwork Profile ID:", upworkProfileId);
+
       // Extract profile data using your exact selectors
       const data = await extractUpworkProfileData();
 
       if (data.success) {
+        // Add upworkProfileId to the extracted data
+        data.profileData.upworkProfileId = upworkProfileId;
+
         setExtractedData(data.profileData);
         setStatus("✅ Profile data extracted successfully!");
 
@@ -70,7 +77,10 @@ function ProfileImportModal({ onClose }) {
         const apiResponse = await sendProfileToBackend(data.profileData);
 
         if (apiResponse.success) {
-          setStatus("🎉 Profile created successfully!");
+          const message = apiResponse.data?.isUpdate
+            ? "🎉 Profile updated successfully!"
+            : "🎉 Profile created successfully!";
+          setStatus(message);
         } else {
           throw new Error(apiResponse.error || "Failed to create profile");
         }
@@ -82,6 +92,19 @@ function ProfileImportModal({ onClose }) {
       setStatus(`❌ Error: ${error.message}`);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Function to extract Upwork profile ID from URL
+  const extractUpworkProfileId = () => {
+    try {
+      const url = window.location.href;
+      // Match pattern: https://www.upwork.com/freelancers/~016e3a36179c292eb3
+      const match = url.match(/\/freelancers\/~([a-zA-Z0-9]+)/);
+      return match ? match[1] : null;
+    } catch (error) {
+      console.error("Failed to extract Upwork profile ID:", error);
+      return null;
     }
   };
 
@@ -163,14 +186,14 @@ function ProfileImportModal({ onClose }) {
       const skillElements = document.getElementsByClassName("skill-name");
       if (skillElements.length > 0) {
         profileData.skills = Array.from(skillElements).map((el) =>
-          el.textContent.trim()
+          el.textContent.trim(),
         );
       }
 
       // Extract employment history using the correct selectors
       const employmentHistory = [];
       const jobEntryElements = document.querySelectorAll(
-        ".air3-card-sections .air3-card-section.px-0"
+        ".air3-card-sections .air3-card-section.px-0",
       );
 
       // Filter elements to only include actual employment (not certifications/skills)
@@ -200,7 +223,7 @@ function ProfileImportModal({ onClose }) {
           ];
 
           const shouldSkip = skipKeywords.some((keyword) =>
-            title.includes(keyword)
+            title.includes(keyword),
           );
 
           // Debug logging for filtering
@@ -209,7 +232,7 @@ function ProfileImportModal({ onClose }) {
           }
 
           return !shouldSkip;
-        }
+        },
       );
 
       filteredElements.forEach((jobElement) => {
@@ -223,7 +246,7 @@ function ProfileImportModal({ onClose }) {
           .trim();
 
         const datesElement = jobElement.querySelector(
-          ".mt-3x.text-light-on-inverse"
+          ".mt-3x.text-light-on-inverse",
         );
         let dates = datesElement?.textContent || "";
 
@@ -272,7 +295,7 @@ function ProfileImportModal({ onClose }) {
       // Extract portfolio projects
       const projects = [];
       const projectLinkElements = document.querySelectorAll(
-        '.air3-grid-container.mt-6x .span-md-4 a[href="javascript:"]'
+        '.air3-grid-container.mt-6x .span-md-4 a[href="javascript:"]',
       );
 
       if (projectLinkElements.length > 0) {
@@ -295,7 +318,7 @@ function ProfileImportModal({ onClose }) {
       try {
         const certifications = [];
         const certificationElements = document.querySelectorAll(
-          '[data-testid="certificate-wrapper"]'
+          '[data-testid="certificate-wrapper"]',
         );
 
         if (certificationElements.length > 0) {
@@ -313,7 +336,7 @@ function ProfileImportModal({ onClose }) {
               "";
 
             const issueDateElement = certElement.querySelector(
-              ".mb-2x:last-child span"
+              ".mb-2x:last-child span",
             );
             const issueDate =
               issueDateElement?.textContent.replace("Issued:", "").trim() || "";
@@ -373,7 +396,7 @@ function ProfileImportModal({ onClose }) {
 
       // Try to extract year ranges like "2020 - 2023" or "2020 - Present"
       const yearMatch = dateString.match(
-        /(\d{4})\s*-\s*(\d{4}|Present|Current)/
+        /(\d{4})\s*-\s*(\d{4}|Present|Current)/,
       );
       if (yearMatch) {
         const startYear = parseInt(yearMatch[1]);
@@ -432,7 +455,7 @@ function ProfileImportModal({ onClose }) {
 
       if (!token) {
         throw new Error(
-          "No authentication token found. Please login to the website first."
+          "No authentication token found. Please login to the website first.",
         );
       }
 
@@ -443,6 +466,7 @@ function ProfileImportModal({ onClose }) {
         lastName: profileData.lastName,
         profession: profileData.profession,
         description: profileData.description,
+        upworkProfileId: profileData.upworkProfileId,
         skills: profileData.skills || [],
         employmentHistory: profileData.employmentHistory || [],
         certifications: profileData.certifications || [],
@@ -458,7 +482,7 @@ function ProfileImportModal({ onClose }) {
           method: "POST",
           headers: API_CONFIG.getAuthHeaders(token),
           body: JSON.stringify(backendData),
-        }
+        },
       );
 
       const result = await response.json();
@@ -593,8 +617,8 @@ function ProfileImportModal({ onClose }) {
                   status.includes("✅") || status.includes("🎉")
                     ? "bg-green-100 text-green-800"
                     : status.includes("❌")
-                    ? "bg-red-100 text-red-800"
-                    : "bg-blue-100 text-blue-800"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-blue-100 text-blue-800"
                 }`}
               >
                 {status}

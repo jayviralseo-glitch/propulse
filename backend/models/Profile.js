@@ -60,6 +60,11 @@ const profileSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    upworkProfileId: {
+      type: String,
+      sparse: true, // Allows multiple null values but unique non-null values
+      index: true,
+    },
     firstName: {
       type: String,
       required: true,
@@ -103,7 +108,7 @@ const profileSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default mongoose.model("Profile", profileSchema);

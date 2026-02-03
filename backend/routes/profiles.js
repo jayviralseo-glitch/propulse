@@ -63,27 +63,69 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Create a new profile
+// Create a new profile or update existing one if upworkProfileId matches
 router.post("/", authenticateToken, async (req, res) => {
   try {
     // Debug logging - Backend received data
     console.log("📥 [BACKEND] Profile creation request from:", req.user.email);
+    console.log("📥 [BACKEND] Upwork Profile ID:", req.body.upworkProfileId);
 
-    const profile = new Profile(req.body);
-    const savedProfile = await profile.save();
+    let savedProfile;
+    let isUpdate = false;
 
-    // Add profile to user
-    await User.findByIdAndUpdate(req.user._id, {
-      $push: { profiles: savedProfile._id },
-    });
+    // Check if upworkProfileId exists and if profile already exists
+    if (req.body.upworkProfileId) {
+      const existingProfile = await Profile.findOne({
+        upworkProfileId: req.body.upworkProfileId,
+      });
 
-    // Debug logging - Backend response
-    console.log("✅ [BACKEND] Profile created:", savedProfile.profileName);
+      if (existingProfile) {
+        // Check if user owns this profile
+        const user = await User.findById(req.user._id);
+        if (user.profiles.includes(existingProfile._id)) {
+          // Update existing profile
+          console.log(
+            "🔄 [BACKEND] Updating existing profile:",
+            existingProfile.profileName,
+          );
+          savedProfile = await Profile.findByIdAndUpdate(
+            existingProfile._id,
+            req.body,
+            { new: true, runValidators: true },
+          );
+          isUpdate = true;
+        } else {
+          // Profile exists but belongs to another user
+          return res.status(403).json({
+            success: false,
+            message: "This Upwork profile is already imported by another user",
+          });
+        }
+      }
+    }
 
-    res.status(201).json({
+    // Create new profile if not updating
+    if (!isUpdate) {
+      const profile = new Profile(req.body);
+      savedProfile = await profile.save();
+
+      // Add profile to user
+      await User.findByIdAndUpdate(req.user._id, {
+        $push: { profiles: savedProfile._id },
+      });
+
+      console.log("✅ [BACKEND] Profile created:", savedProfile.profileName);
+    } else {
+      console.log("✅ [BACKEND] Profile updated:", savedProfile.profileName);
+    }
+
+    res.status(isUpdate ? 200 : 201).json({
       success: true,
-      message: "Profile created successfully",
+      message: isUpdate
+        ? "Profile updated successfully"
+        : "Profile created successfully",
       profile: savedProfile,
+      isUpdate: isUpdate,
     });
   } catch (error) {
     // Debug logging - Backend error
