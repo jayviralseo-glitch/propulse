@@ -4,7 +4,7 @@ import API_CONFIG from "../config/api.js";
 export function extractJobDescription() {
   try {
     const descriptionElement = document.querySelector(
-      ".description .air3-truncation span span"
+      ".description .air3-truncation span span",
     );
     if (descriptionElement) {
       return descriptionElement.textContent.trim();
@@ -61,7 +61,7 @@ export function showToast(message) {
 // Function to paste proposal to the textarea
 export function pasteToTextarea(proposal) {
   const textarea = document.querySelector(
-    'textarea[data-v-cf0298f4][class*="air3-textarea"][class*="inner-textarea"]'
+    'textarea[data-v-cf0298f4][class*="air3-textarea"][class*="inner-textarea"]',
   );
 
   if (textarea) {
@@ -80,7 +80,7 @@ export function pasteToTextarea(proposal) {
     return true;
   } else {
     alert(
-      "Cover letter textarea not found. Please make sure you're on the proposal form."
+      "Cover letter textarea not found. Please make sure you're on the proposal form.",
     );
     return false;
   }
@@ -90,7 +90,7 @@ export function pasteToTextarea(proposal) {
 export async function fetchTemplates() {
   try {
     const response = await fetch(
-      API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TEMPLATES.LIST)
+      API_CONFIG.buildUrl(API_CONFIG.ENDPOINTS.TEMPLATES.LIST),
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -136,7 +136,7 @@ export async function fetchUserProfiles() {
       {
         method: "GET",
         headers: API_CONFIG.getAuthHeaders(token),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -152,7 +152,11 @@ export async function fetchUserProfiles() {
 }
 
 // Function to generate proposal with specific template and profile
-export async function generateProposalWithTemplate(template, selectedProfile) {
+export async function generateProposalWithTemplate(
+  template,
+  selectedProfile,
+  customPrompt = null,
+) {
   try {
     const jobDescription = extractJobDescription();
     if (!jobDescription) {
@@ -188,7 +192,7 @@ export async function generateProposalWithTemplate(template, selectedProfile) {
 
     if (!token) {
       throw new Error(
-        "No authentication token found. Please login to the website first."
+        "No authentication token found. Please login to the website first.",
       );
     }
 
@@ -203,23 +207,24 @@ export async function generateProposalWithTemplate(template, selectedProfile) {
           templateId: template._id,
           profileId: selectedProfile._id,
           proposalUrl: window.location.href,
+          customPrompt: customPrompt,
         }),
-      }
+      },
     );
 
     if (!response.ok) {
       const errorData = await response.json();
       if (errorData.error === "Plan expired") {
         throw new Error(
-          "Your subscription has expired. Please renew to continue generating proposals."
+          "Your subscription has expired. Please renew to continue generating proposals.",
         );
       } else if (errorData.error === "Inactive plan") {
         throw new Error(
-          "You need an active subscription to generate proposals. Please upgrade your plan."
+          "You need an active subscription to generate proposals. Please upgrade your plan.",
         );
       } else if (errorData.error === "No proposals left") {
         throw new Error(
-          "You have no proposals remaining. Please upgrade your plan or wait for next billing cycle."
+          "You have no proposals remaining. Please upgrade your plan or wait for next billing cycle.",
         );
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -232,7 +237,7 @@ export async function generateProposalWithTemplate(template, selectedProfile) {
     // Show remaining proposals count
     if (data.remainingProposals !== undefined) {
       showToast(
-        `Proposal generated! ${data.remainingProposals} proposals remaining.`
+        `Proposal generated! ${data.remainingProposals} proposals remaining.`,
       );
     } else {
       showToast("Proposal generated successfully!");

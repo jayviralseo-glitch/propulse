@@ -36,6 +36,7 @@ const proposalTemplateSchema = new mongoose.Schema(
         "Globe",
         "Code",
         "Sparkles",
+        "DollarSign",
       ],
       default: "FileText",
     },
@@ -66,7 +67,7 @@ const proposalTemplateSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export default mongoose.model("ProposalTemplate", proposalTemplateSchema);

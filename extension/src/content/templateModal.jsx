@@ -41,6 +41,103 @@ const getIconDisplay = (iconName) => {
   return iconMap[iconName] || "📄"; // Default to FileText if icon not found
 };
 
+// Syntax highlighter for template editor
+const HighlightedEditor = ({ value, onChange }) => {
+  const editorRef = React.useRef(null);
+  const isUpdatingRef = React.useRef(false);
+
+  const getHighlightedContent = (text) => {
+    const parts = [];
+    let lastIndex = 0;
+
+    // Pattern to match ## headers and {} blocks
+    const pattern = /(##\s+[^\n]*)|(\{[^}]*\})/g;
+    let match;
+
+    while ((match = pattern.exec(text)) !== null) {
+      // Add text before this match
+      if (match.index > lastIndex) {
+        const plainText = text.substring(lastIndex, match.index);
+        parts.push({ type: "text", content: plainText });
+      }
+
+      // Add the matched element
+      if (match[1]) {
+        // ## header
+        parts.push({ type: "header", content: match[1] });
+      } else if (match[2]) {
+        // {} block
+        parts.push({ type: "block", content: match[2] });
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push({ type: "text", content: text.substring(lastIndex) });
+    }
+
+    return parts;
+  };
+
+  const handleInput = (e) => {
+    const text = e.currentTarget.textContent || "";
+    isUpdatingRef.current = true;
+    onChange(text);
+    setTimeout(() => {
+      isUpdatingRef.current = false;
+    }, 0);
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
+  };
+
+  React.useEffect(() => {
+    if (
+      !isUpdatingRef.current &&
+      editorRef.current &&
+      value !== (editorRef.current.textContent || "")
+    ) {
+      const parts = getHighlightedContent(value);
+      editorRef.current.innerHTML = parts
+        .map((part) => {
+          if (part.type === "header") {
+            return `<strong style="font-weight: 700; color: #1f2937;">${part.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</strong>`;
+          } else if (part.type === "block") {
+            return `<span style="background-color: #dcfce7; padding: 2px 4px; border-radius: 3px; color: #15803d;">${part.content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>`;
+          } else {
+            return part.content
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/\n/g, "<br>");
+          }
+        })
+        .join("");
+    }
+  }, [value]);
+
+  return (
+    <div
+      ref={editorRef}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={handleInput}
+      onPaste={handlePaste}
+      className="flex-1 w-full p-4 border border-gray-300 rounded-lg text-sm text-gray-700 bg-white font-mono focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none mb-4 min-h-[400px] whitespace-pre-wrap break-words"
+      style={{
+        fontFamily:
+          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+        lineHeight: "1.5",
+        overflow: "auto",
+      }}
+    />
+  );
+};
+
 // Function to show the template selection modal
 export function showTemplateModal() {
   // Remove existing modal if any
@@ -112,6 +209,11 @@ function TemplateModal({ onClose }) {
   const [userPlanStatus, setUserPlanStatus] = useState(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
 
+  // New states for prompt editing
+  const [editingTemplate, setEditingTemplate] = useState(null);
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+
   // Fetch user info including proposal count and plan status
   const fetchUserInfo = async () => {
     try {
@@ -145,7 +247,7 @@ function TemplateModal({ onClose }) {
         {
           method: "GET",
           headers: API_CONFIG.getAuthHeaders(token),
-        }
+        },
       );
 
       if (response.ok) {
@@ -173,7 +275,7 @@ function TemplateModal({ onClose }) {
         console.error(
           "Failed to fetch user data:",
           response.status,
-          response.statusText
+          response.statusText,
         );
         const errorText = await response.text();
         console.error("Error response body:", errorText);
@@ -235,34 +337,50 @@ function TemplateModal({ onClose }) {
     // Check if user can generate proposals
     if (userPlanStatus === "expired") {
       alert(
-        "Your subscription has expired. Please renew to continue generating proposals."
+        "Your subscription has expired. Please renew to continue generating proposals.",
       );
       return;
     }
 
     if (userPlanStatus !== "active") {
       alert(
-        "You need an active subscription to generate proposals. Please upgrade your plan."
+        "You need an active subscription to generate proposals. Please upgrade your plan.",
       );
       return;
     }
 
     if (userProposalCount <= 0) {
       alert(
-        "You have no proposals remaining. Please upgrade your plan or wait for next billing cycle."
+        "You have no proposals remaining. Please upgrade your plan or wait for next billing cycle.",
       );
       return;
     }
 
+    // Go to prompt editing mode instead of generating immediately
+    setEditingTemplate(template);
+    setCustomPrompt(template.prompt || "");
+  };
+
+  const executeGeneration = async () => {
+    if (!editingTemplate || !customPrompt.trim()) return;
+
+    setIsGenerating(true);
+
     try {
       const proposal = await generateProposalWithTemplate(
-        template,
-        selectedProfile
+        editingTemplate,
+        selectedProfile,
+        customPrompt,
       );
-      showProposalInterface(proposal, template);
+      showProposalInterface(proposal, editingTemplate);
 
       // Update local proposal count after successful generation
       setUserProposalCount((prev) => prev - 1);
+
+      // Close the template modal as we go to the proposal interface
+      setTimeout(() => {
+        handleClose();
+      }, 300);
     } catch (error) {
       console.error("Error generating proposal:", error);
       if (error.message.includes("authentication token")) {
@@ -270,6 +388,8 @@ function TemplateModal({ onClose }) {
       } else {
         alert("Error generating proposal. Please try again.");
       }
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -345,7 +465,7 @@ function TemplateModal({ onClose }) {
                     setSelectedProfile(null);
                   } else {
                     const profile = profiles.find(
-                      (p) => p._id === e.target.value
+                      (p) => p._id === e.target.value,
                     );
                     setSelectedProfile(profile);
                   }
@@ -377,13 +497,16 @@ function TemplateModal({ onClose }) {
             </div>
 
             {/* Warning Message */}
-            {!subscriptionLoading && userPlanStatus !== "active" && userPlanStatus !== "expired" && userPlanStatus !== null && (
-              <div className="mt-3 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                <p className="text-red-300 text-sm font-medium">
-                  ⚠️ You need an active subscription to generate proposals
-                </p>
-              </div>
-            )}
+            {!subscriptionLoading &&
+              userPlanStatus !== "active" &&
+              userPlanStatus !== "expired" &&
+              userPlanStatus !== null && (
+                <div className="mt-3 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <p className="text-red-300 text-sm font-medium">
+                    ⚠️ You need an active subscription to generate proposals
+                  </p>
+                </div>
+              )}
             {!subscriptionLoading && userPlanStatus === "expired" && (
               <div className="mt-3 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
                 <p className="text-red-300 text-sm font-medium">
@@ -392,14 +515,16 @@ function TemplateModal({ onClose }) {
                 </p>
               </div>
             )}
-            {!subscriptionLoading && userPlanStatus === "active" && userProposalCount <= 0 && (
-              <div className="mt-3 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
-                <p className="text-yellow-300 text-sm font-medium">
-                  ⚠️ You have no proposals remaining. Please upgrade your plan
-                  or wait for next billing cycle.
-                </p>
-              </div>
-            )}
+            {!subscriptionLoading &&
+              userPlanStatus === "active" &&
+              userProposalCount <= 0 && (
+                <div className="mt-3 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+                  <p className="text-yellow-300 text-sm font-medium">
+                    ⚠️ You have no proposals remaining. Please upgrade your plan
+                    or wait for next billing cycle.
+                  </p>
+                </div>
+              )}
           </div>
 
           <button
@@ -422,56 +547,123 @@ function TemplateModal({ onClose }) {
 
         {/* Main content area */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {templatesLoading && (
-              <div className="col-span-full flex flex-col items-center justify-center py-12 px-5 text-center">
-                <div className="w-8 h-8 border-3 border-gray-200 border-t-indigo-500 rounded-full animate-spin mb-3" />
-                <div className="text-gray-500 text-sm font-medium">
-                  Loading AI templates...
-                </div>
-                <div className="text-gray-400 text-xs mt-1">
-                  Preparing your proposal options
-                </div>
-              </div>
-            )}
+          {editingTemplate ? (
+            <div className="flex-1 flex flex-col h-full">
+              <HighlightedEditor
+                value={customPrompt}
+                onChange={setCustomPrompt}
+              />
 
-            {templatesError && (
-              <div className="col-span-full flex flex-col items-center justify-center py-12 px-5 text-center">
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth="2"
-                  className="mb-3"
+              <div className="flex justify-between items-center mt-auto flex-shrink-0">
+                <button
+                  onClick={() => setEditingTemplate(null)}
+                  disabled={isGenerating}
+                  className="px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m15 9-6 6" />
-                  <path d="m9 9 6 6" />
-                </svg>
-                <div className="text-red-500 text-base font-semibold mb-2">
-                  Failed to Load Templates
-                </div>
-                <div className="text-gray-500 text-sm">
-                  Please check your connection and try again
-                </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                  Back to Templates
+                </button>
+                <button
+                  onClick={executeGeneration}
+                  disabled={isGenerating}
+                  className="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg text-sm font-bold shadow-sm hover:shadow hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all flex items-center justify-center gap-2 min-w-[160px] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  {isGenerating ? (
+                    <>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="animate-spin"
+                      >
+                        <path d="M21 12a9 9 0 11-6.219-8.56" />
+                      </svg>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                      </svg>
+                      Generate Proposal
+                    </>
+                  )}
+                </button>
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {templatesLoading && (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 px-5 text-center">
+                  <div className="w-8 h-8 border-3 border-gray-200 border-t-indigo-500 rounded-full animate-spin mb-3" />
+                  <div className="text-gray-500 text-sm font-medium">
+                    Loading AI templates...
+                  </div>
+                  <div className="text-gray-400 text-xs mt-1">
+                    Preparing your proposal options
+                  </div>
+                </div>
+              )}
 
-            {!templatesLoading &&
-              !templatesError &&
-              templates.map((template, index) => (
-                <TemplateCard
-                  key={template.id || index}
-                  template={template}
-                  index={index}
-                  onGenerate={handleGenerateProposal}
-                  selectedProfile={selectedProfile}
-                  subscriptionLoading={subscriptionLoading}
-                />
-              ))}
-          </div>
+              {templatesError && (
+                <div className="col-span-full flex flex-col items-center justify-center py-12 px-5 text-center">
+                  <svg
+                    width="40"
+                    height="40"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth="2"
+                    className="mb-3"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="m15 9-6 6" />
+                    <path d="m9 9 6 6" />
+                  </svg>
+                  <div className="text-red-500 text-base font-semibold mb-2">
+                    Failed to Load Templates
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                    Please check your connection and try again
+                  </div>
+                </div>
+              )}
+
+              {!templatesLoading &&
+                !templatesError &&
+                templates.map((template, index) => (
+                  <TemplateCard
+                    key={template.id || index}
+                    template={template}
+                    index={index}
+                    onGenerate={handleGenerateProposal}
+                    selectedProfile={selectedProfile}
+                    subscriptionLoading={subscriptionLoading}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -479,7 +671,13 @@ function TemplateModal({ onClose }) {
 }
 
 // Template Card Component
-function TemplateCard({ template, index, onGenerate, selectedProfile, subscriptionLoading }) {
+function TemplateCard({
+  template,
+  index,
+  onGenerate,
+  selectedProfile,
+  subscriptionLoading,
+}) {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(false);
 
@@ -566,10 +764,10 @@ function TemplateCard({ template, index, onGenerate, selectedProfile, subscripti
           generating
             ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
             : error
-            ? "bg-gradient-to-r from-red-500 to-red-600 text-white"
-            : !selectedProfile || subscriptionLoading
-            ? "bg-gray-400 text-white cursor-not-allowed"
-            : "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:-translate-y-0.5 hover:shadow-sm"
+              ? "bg-gradient-to-r from-red-500 to-red-600 text-white"
+              : !selectedProfile || subscriptionLoading
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:-translate-y-0.5 hover:shadow-sm"
         }`}
       >
         {generating ? (

@@ -1,0 +1,116 @@
+[
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936f8"
+    },
+    "name": "Job Application",
+    "description": "Perfect for applying to part-time or full-time positions with enthusiasm and qualifications.",
+    "icon": "Briefcase",
+    "prompt": "Based on this job description, create an engaging job application for {firstName} {lastName} that stands out:\n\n**Opening Statement (2-3 sentences):**\n- Express genuine excitement for the role and company\n- Mention the specific position you're applying for\n- Include a compelling reason why you're interested\n\n**Why I'm Perfect for This Role (2-3 paragraphs):**\n- **Relevant Skills & Experience:**\n  - Match 3-4 key requirements from the job description\n  - Provide specific examples of how you've used these skills\n  - Quantify achievements where possible (e.g., \"increased efficiency by 25%\")\n  \n- **Cultural Fit & Work Style:**\n  - Show how your work ethic aligns with their needs\n  - Mention relevant soft skills (communication, teamwork, etc.)\n  - Include any company research or values alignment\n  \n- **Unique Value Proposition:**\n  - What makes you different from other candidates\n  - How you can contribute beyond the basic requirements\n  - Any special certifications or unique experiences\n\n**Why This Company/Role:**\n- Show you've researched the company\n- Explain why this role excites you\n- How it fits your career goals\n\n**Call to Action:**\n- Express eagerness to discuss the opportunity\n- Suggest next steps (interview, call, etc.)\n- Show flexibility and enthusiasm\n\n**Formatting Tips:**\n- Use bullet points for skills and achievements\n- Keep paragraphs concise and impactful\n- Total length: 250-350 words\n- Make it easy to scan and remember\n- Add proper spacing between sections\n- NO markdown formatting - use plain text only\n- IMPORTANT: Use {firstName} {lastName} throughout the application\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n\nCreate an application that shows genuine enthusiasm, relevant qualifications, and makes them excited to meet you. Use proper spacing and formatting. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "job-application",
+    "order": 3,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.688Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:58:25.487Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936fa"
+    },
+    "name": "Engaging Questions",
+    "description": "Get clients thinking and engaged with thoughtful questions about their project.",
+    "icon": "Sparkles",
+    "prompt": "Based on this job description, create an engaging proposal for {firstName} {lastName} that uses questions to demonstrate expertise:\n\n**Project Acknowledgment (1 paragraph):**\n- Show you understand the basic scope\n- Acknowledge the complexity and importance\n- Express genuine interest in helping them succeed\n\n**Strategic Questions (3-4 questions):**\n- **Business Context Questions:**\n  - \"What's the primary business goal behind this project?\"\n  - \"Who are the end users and what problems are we solving?\"\n  \n- **Technical & Scope Questions:**\n  - \"What's your timeline and budget considerations?\"\n  - \"Are there any technical constraints or preferences?\"\n  \n- **Success & Future Questions:**\n  - \"How will you measure the success of this project?\"\n  - \"What's your vision for future iterations or scaling?\"\n\n**Why These Questions Matter:**\n- Explain how understanding these details leads to better solutions\n- Show your expertise through the questions you ask\n- Demonstrate strategic thinking and attention to detail\n\n**My Approach:**\n- Brief overview of how you'll use their answers\n- Your methodology for gathering requirements\n- How you'll ensure alignment and success\n\n**Next Steps:**\n- Suggest a discovery call or meeting\n- What you'll prepare based on their answers\n- How to move forward together\n\n**Formatting:**\n- Use the questions as conversation starters\n- Keep it conversational and engaging\n- Total length: 200-250 words\n- Make them excited to answer your questions\n- Add proper spacing between sections\n- NO markdown formatting - use plain text only\n- IMPORTANT: Use {firstName} {lastName} throughout the proposal\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n- Projects: {projects}\n\nCreate a proposal that makes them think, shows your expertise, and gets them excited to have a conversation. Use proper spacing and formatting. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "questions",
+    "order": 5,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.688Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:59:53.052Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936fb"
+    },
+    "name": "Detailed Estimate",
+    "description": "Provide a comprehensive project estimate with clear breakdown and value proposition.",
+    "icon": "DollarSign",
+    "prompt": "Based on this job description, create a detailed project estimate proposal for {firstName} {lastName}:\n\n**Project Understanding (1 paragraph):**\n- Summarize what you understand they need\n- Acknowledge the scope and complexity\n- Show you've thought through the requirements\n\n**Project Breakdown (3-4 phases):**\n- **Phase 1: Discovery & Planning**\n  - Requirements gathering and analysis\n  - Project planning and architecture design\n  - Timeline: [X] days, Investment: $[X]\n  \n- **Phase 2: Development & Implementation**\n  - Core development and testing\n  - Regular progress updates and feedback\n  - Timeline: [X] days, Investment: $[X]\n  \n- **Phase 3: Testing & Deployment**\n  - Quality assurance and testing\n  - Deployment and launch support\n  - Timeline: [X] days, Investment: $[X]\n  \n- **Phase 4: Post-Launch Support**\n  - Bug fixes and minor adjustments\n  - Documentation and training\n  - Timeline: [X] days, Investment: $[X]\n\n**Total Investment: $[X]**\n**Total Timeline: [X] weeks**\n\n**What's Included:**\n- Clear deliverables for each phase\n- Communication and progress updates\n- Quality assurance and testing\n- Post-launch support period\n- Source code and documentation\n\n**Why This Investment Makes Sense:**\n- Risk mitigation through structured approach\n- Quality assurance and testing included\n- Ongoing support and maintenance\n- Scalable and maintainable solution\n- Long-term value vs. short-term cost\n\n**Terms & Conditions:**\n- Payment schedule (e.g., 50% upfront, 50% on completion)\n- Change request policy\n- Support and maintenance terms\n- Intellectual property rights\n\n**Next Steps:**\n- How to get started\n- What you need from them\n- Timeline for project kickoff\n\n**Formatting:**\n- Use clear headings and bullet points\n- Include realistic timelines and costs\n- Professional but approachable tone\n- Total length: 300-400 words\n- Make the value clear and compelling\n- Add proper spacing between sections\n- NO markdown formatting - use plain text only\n- IMPORTANT: Use {firstName} {lastName} throughout the proposal\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n- Projects: {projects}\n\nCreate an estimate that shows professionalism, transparency, and clear value for their investment. Use proper spacing and formatting. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "estimate",
+    "order": 6,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.688Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:58:25.491Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936f7"
+    },
+    "name": "Strategic Approach",
+    "description": "Demonstrate your problem-solving methodology and strategic thinking.",
+    "icon": "Users",
+    "prompt": "Based on this job description, create a strategic proposal for {firstName} {lastName} that showcases your approach:\n\n**Project Analysis (1 paragraph):**\n- Acknowledge the client's specific needs and challenges\n- Show you understand the scope and complexity\n- Identify key success factors\n\n**My Strategic Approach (2-3 paragraphs):**\n- **Phase 1: Discovery & Planning**\n  - How you'll gather requirements and understand their business\n  - Initial planning and timeline development\n  \n- **Phase 2: Execution & Development**\n  - Your development methodology and tools\n  - How you'll ensure quality and communication\n  \n- **Phase 3: Delivery & Support**\n  - Testing and quality assurance process\n  - Post-launch support and maintenance\n\n**Why This Approach Works:**\n- Highlight your relevant experience with similar projects\n- Explain how your methodology reduces risks\n- Show how you'll deliver value efficiently\n\n**Next Steps:**\n- Clear timeline and milestones\n- What you need from them to get started\n- How we'll communicate and collaborate\n\n**Key Benefits:**\n- Risk mitigation through structured approach\n- Clear communication and transparency\n- Proven methodology for successful delivery\n\n**Formatting Requirements:**\n- Use proper paragraph breaks with blank lines between sections\n- Include bullet points using regular dashes (-)\n- Add spacing between major sections for readability\n- NO markdown formatting - use plain text only\n- Make it easy to scan and understand\n- IMPORTANT: Use {firstName} {lastName} throughout the proposal\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n- Projects: {projects}\n\nCreate a proposal that shows strategic thinking, clear methodology, and confidence in delivering results. Use proper spacing and formatting. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "approach",
+    "order": 2,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.688Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:58:25.486Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936f6"
+    },
+    "name": "Professional Cover Letter",
+    "description": "A comprehensive cover letter that showcases your expertise and enthusiasm for the project.",
+    "icon": "FileText",
+    "prompt": "Based on this job description, create a professional and compelling cover letter for {firstName} {lastName} that follows this structure:\n\n**Opening Paragraph (2-3 sentences):**\n- Start with a strong, enthusiastic opening that shows genuine interest\n- Mention the specific role/project you're applying for\n- Include a brief personal connection or relevant experience\n\n**Body Paragraphs (2-3 paragraphs):**\n- **Experience & Skills:** Highlight 2-3 most relevant skills with specific examples\n- **Project Understanding:** Show you understand their needs and challenges\n- **Value Proposition:** Explain how your expertise will benefit their project\n- **Past Success:** Include 1-2 brief examples of similar work (if applicable)\n\n**Closing Paragraph (2-3 sentences):**\n- Reiterate your enthusiasm and fit for the role\n- Include a clear call-to-action\n- End with a professional closing\n\n**Tone Guidelines:**\n- Professional yet warm and personable\n- Confident but not arrogant\n- Specific and detailed, not generic\n- Show enthusiasm and genuine interest\n- Keep it conversational and engaging\n\n**Formatting Requirements:**\n- Use proper paragraph breaks with blank lines between sections\n- Include bullet points where appropriate using regular dashes (-)\n- Keep total length to 200-300 words\n- Make it scannable and easy to read\n- NO markdown formatting - use plain text only\n- Add proper spacing between paragraphs for readability\n- IMPORTANT: Use {firstName} {lastName} throughout the cover letter\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n- Projects: {projects}\n\nCreate a cover letter that feels personal, professional, and specifically tailored to this opportunity. Use proper spacing and formatting for easy reading. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "cover-letter",
+    "order": 1,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.687Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:58:25.484Z"
+    }
+  },
+  {
+    "_id": {
+      "$oid": "68aca1ba34720f7d048936f9"
+    },
+    "name": "Concise Proposal",
+    "description": "A short, impactful proposal perfect for smaller projects and quick responses.",
+    "icon": "FileText",
+    "prompt": "Based on this job description, create a concise and compelling proposal for {firstName} {lastName}:\n\n**Quick Summary (1 sentence):**\n- One-line overview of what you understand they need\n\n**My Solution (2-3 bullet points):**\n- **What I'll deliver:** Clear, specific deliverables\n- **How I'll do it:** Brief methodology or approach\n- **Why choose me:** 1-2 key differentiators\n\n**Timeline & Investment:**\n- Estimated timeline (be realistic)\n- Rate or project cost (if applicable)\n- Any special terms or conditions\n\n**Why I'm the Right Choice:**\n- 2-3 relevant skills or experiences\n- 1 brief success story or achievement\n- What makes you reliable and trustworthy\n\n**Next Steps:**\n- Clear call-to-action\n- How to get started\n- What you need from them\n\n**Formatting:**\n- Keep it under 150 words\n- Use bullet points for clarity\n- Make it scannable in 30 seconds\n- Professional but friendly tone\n- Add proper spacing between sections\n- NO markdown formatting - use plain text only\n- IMPORTANT: Use {firstName} {lastName} throughout the proposal\n- Sign with the freelancer's actual name: {firstName} {lastName}\n\nJob Description: {jobDescription}\n\nFreelancer Profile:\n- Name: {firstName} {lastName}\n- Profession: {profession}\n- Skills: {skills}\n- Experience: {description}\n- Projects: {projects}\n\nCreate a proposal that's short, sweet, and impossible to ignore. Every word should count! Use proper spacing and formatting. Always use the freelancer's real name, never use placeholders.",
+    "isActive": true,
+    "category": "simple",
+    "order": 4,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2025-08-25T17:47:38.688Z"
+    },
+    "updatedAt": {
+      "$date": "2025-08-26T20:58:25.489Z"
+    }
+  }
+]

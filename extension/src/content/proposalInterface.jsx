@@ -2,6 +2,96 @@ import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
 import { pasteToTextarea } from "./utils.js";
 
+// Markdown renderer for proposal text
+const renderMarkdown = (text) => {
+  let html = text || "";
+
+  // Escape HTML
+  html = html
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Headers: ## and ###
+  html = html.replace(
+    /^### (.+)$/gm,
+    '<h3 style="font-size: 1.125rem; font-weight: bold; margin: 12px 0 8px 0; color: #1f2937;">$1</h3>',
+  );
+  html = html.replace(
+    /^## (.+)$/gm,
+    '<h2 style="font-size: 1.25rem; font-weight: bold; margin: 16px 0 12px 0; color: #1f2937;">$1</h2>',
+  );
+
+  // Bold: **text**
+  html = html.replace(
+    /\*\*(.+?)\*\*/g,
+    '<strong style="font-weight: 600;">$1</strong>',
+  );
+
+  // Italic: *text*
+  html = html.replace(/\*(.+?)\*/g, '<em style="font-style: italic;">$1</em>');
+
+  // Instruction blocks: {text}
+  html = html.replace(
+    /(\{[^}]+\})/g,
+    '<span style="background-color: #dcfce7; border-left: 4px solid #16a34a; padding: 8px 12px; border-radius: 4px; color: #15803d; display: inline-block; margin: 4px 0;">$1</span>',
+  );
+
+  // Numbered lists - proper wrapping with <ol>
+  const lines = html.split("<br>");
+  const processedLines = [];
+  let inList = false;
+  let listItems = [];
+
+  lines.forEach((line) => {
+    const numberedMatch = line.match(/^(\d+)\.\s+(.+)$/);
+    if (numberedMatch) {
+      if (!inList) {
+        inList = true;
+      }
+      listItems.push(
+        `<li style="margin-bottom: 8px; line-height: 1.6;">${numberedMatch[2]}</li>`,
+      );
+    } else {
+      if (inList && listItems.length > 0) {
+        processedLines.push(
+          `<ol style="margin: 12px 0; padding-left: 24px;">${listItems.join("")}</ol>`,
+        );
+        listItems = [];
+        inList = false;
+      }
+      if (line.trim()) {
+        processedLines.push(line);
+      }
+    }
+  });
+
+  if (inList && listItems.length > 0) {
+    processedLines.push(
+      `<ol style="margin: 12px 0; padding-left: 24px;">${listItems.join("")}</ol>`,
+    );
+  }
+
+  html = processedLines.join("<br>");
+
+  // Paragraphs: double line breaks
+  html = html.replace(
+    /\n\n+/g,
+    '</p><p style="margin-bottom: 12px; line-height: 1.6;">',
+  );
+
+  // Wrap in paragraph if not already
+  if (
+    !html.startsWith("<h") &&
+    !html.startsWith("<p") &&
+    !html.startsWith("<ol")
+  ) {
+    html = '<p style="margin-bottom: 12px; line-height: 1.6;">' + html + "</p>";
+  }
+
+  return html;
+};
+
 // Function to show the proposal in a beautiful interface
 export function showProposalInterface(proposal, template) {
   // Remove existing modal
@@ -55,7 +145,7 @@ export function showProposalInterface(proposal, template) {
       proposal={proposal}
       template={template}
       onClose={() => modalContainer.remove()}
-    />
+    />,
   );
 }
 
@@ -65,12 +155,8 @@ function ProposalInterface({ proposal, template, onClose }) {
   const [lastSaved, setLastSaved] = useState("Auto-saved");
   const editorRef = useRef(null);
 
-  // Convert line breaks to proper HTML formatting
-  const formattedProposal = proposal
-    .replace(/\n\n/g, "</p><p>") // Double line breaks become paragraph breaks
-    .replace(/\n/g, "<br>") // Single line breaks become <br> tags
-    .replace(/^/, "<p>") // Start with opening paragraph tag
-    .replace(/$/, "</p>"); // End with closing paragraph tag
+  // Render markdown to HTML
+  const formattedProposal = renderMarkdown(proposal);
 
   const updateWordCount = () => {
     if (editorRef.current) {
@@ -495,7 +581,7 @@ class TextEditor {
       element &&
       element !== this.element &&
       !["P", "DIV", "H1", "H2", "H3", "H4", "H5", "H6"].includes(
-        element.tagName
+        element.tagName,
       )
     ) {
       element = element.parentElement;

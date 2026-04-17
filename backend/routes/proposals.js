@@ -15,7 +15,13 @@ router.post(
   checkPlanExpiration,
   async (req, res) => {
     try {
-      const { jobDescription, templateId, profileId, proposalUrl } = req.body;
+      const {
+        jobDescription,
+        templateId,
+        profileId,
+        proposalUrl,
+        customPrompt,
+      } = req.body;
 
       // Basic checks
       if (
@@ -46,8 +52,8 @@ router.post(
       if (!profile) return res.status(404).json({ error: "Profile not found" });
 
       // Template (optional)
-      let prompt = null;
-      if (templateId) {
+      let prompt = customPrompt || null;
+      if (!prompt && templateId) {
         const template = await ProposalTemplate.findById(templateId);
         if (template?.prompt) prompt = template.prompt;
       }
@@ -56,7 +62,7 @@ router.post(
       const updatedUser = await User.findOneAndUpdate(
         { _id: req.user.id, availableProposals: { $gt: 0 } },
         { $inc: { availableProposals: -1 } },
-        { new: true }
+        { new: true },
       );
       if (!updatedUser) {
         return res.status(403).json({
@@ -100,7 +106,7 @@ router.post(
         // Restore quota if generation failed
         await User.updateOne(
           { _id: req.user.id },
-          { $inc: { availableProposals: +1 } }
+          { $inc: { availableProposals: +1 } },
         );
         throw genErr;
       }
@@ -111,7 +117,7 @@ router.post(
         message: error.message,
       });
     }
-  }
+  },
 );
 
 export default router;
